@@ -25,7 +25,7 @@ public class OutputLayer extends Layer {
     public Neuron[] getNeurons() {
     	return neurons;
     }
-
+    
     @Override
     public double[] forward(double[] input) {
         for (int i = 0; i < outputSize; i++) {
@@ -40,7 +40,7 @@ public class OutputLayer extends Layer {
         }
         return error;
     }
-
+    
     public double[] backward(double[] prevOutput, double[] target, double learningRate) {
         // Compute error at output layer
         computeError(target);

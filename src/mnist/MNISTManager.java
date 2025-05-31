@@ -10,8 +10,8 @@ public class MNISTManager {
 	int size;
 	
 	public MNISTManager(String labelPath, String imagePath) {
-		labelPath = "src/mnist/" + labelPath;
-		imagePath = "src/mnist/" + imagePath;
+		labelPath = "mnist/" + labelPath;
+		imagePath = "mnist/" + imagePath;
 		try {
 			DataInputStream imageInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(imagePath)));
 			imageInputStream.readInt(); // magic number

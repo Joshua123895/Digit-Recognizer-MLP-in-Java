@@ -1,6 +1,7 @@
 package neuralNetwork;
 
 import activationFunction.ActivationFunction;
+import tool.NumberTool;
 
 public class Neuron {
     private ActivationFunction activationFunction;
@@ -10,10 +11,10 @@ public class Neuron {
     public Neuron(int inputSize, ActivationFunction activationFunction) {
         this.activationFunction = activationFunction;
         this.weights = new double[inputSize];
-        this.bias = Math.random() * 0.2 - 0.1;
+        this.bias = NumberTool.random() * 0.2 - 0.1;
         // Initialize weights
         for (int i = 0; i < inputSize; i++) {
-            weights[i] = Math.random() * 0.2 - 0.1;
+            weights[i] = NumberTool.random() * 0.2 - 0.1;
         }
     }
 

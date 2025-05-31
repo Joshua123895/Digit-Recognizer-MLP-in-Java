@@ -11,8 +11,11 @@ public class NeuralNetwork {
     private ArrayList<Layer> layers;
     public ArrayList<Integer> numHiddenLayers = new ArrayList<>(Arrays.asList(128));
     public ArrayList<String> hiddenActivations = new ArrayList<>(Arrays.asList("sigmoid"));
-    public double learningRate = 0.01;
-    public int epoch = 0;
+    private double learningRate = 0.01;
+    private double decayRate;
+    private int epoch = 0;
+	
+	final double initialLearningRate = 0.01;
     
     public NeuralNetwork() {
     	reconstruct();
@@ -93,4 +96,36 @@ public class NeuralNetwork {
     public void setLayer(int index, Layer layer) {
     	layers.set(index, layer);
     }
+
+	public void setEpoch(int epoch) {
+		this.epoch = epoch;
+	}
+
+	public void nextEpoch() {
+		this.epoch++;
+	}
+
+	public int getEpoch() {
+		return epoch;
+	}
+
+	public void setDecayRate(double decayRate) {
+		this.decayRate = decayRate;
+	}
+
+	public double getDecayRate() {
+		return decayRate;
+	}
+    
+    public void nextLearningate() {
+    	this.learningRate = initialLearningRate * Math.exp(-this.decayRate * this.epoch);
+    }
+
+	public double getLearningRate() {
+		return learningRate;
+	}
+
+	public void setLearningRate(double learningRate) {
+		this.learningRate = learningRate;
+	}
 }

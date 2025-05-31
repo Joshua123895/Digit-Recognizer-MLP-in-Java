@@ -12,4 +12,3 @@ public class Sigmoid implements ActivationFunction {
     	return func * (1 - func);
     }
 }
-
