@@ -6,14 +6,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import activationFunction.ActivationManager;
 import neuralNetwork.HiddenLayer;
 import neuralNetwork.NeuralNetwork;
 import neuralNetwork.Neuron;
 import neuralNetwork.OutputLayer;
-import tool.InputHandler;
 import tool.ConsoleHandler;
+import tool.InputHandler;
 
 public class FileMenu {
 	NeuralNetwork network;
@@ -31,17 +31,17 @@ public class FileMenu {
 		try {
 			DataOutputStream file = new DataOutputStream(new FileOutputStream(filename));
 			
-			int hiddenLayerSize = network.numHiddenLayers.size();
+			int hiddenLayerSize = network.getNumHiddenLayers().size();
 			
 			file.writeInt(hiddenLayerSize);
 			file.writeInt(network.getEpoch());
 			file.writeDouble(network.getDecayRate());
 			
-			for (Integer i : network.numHiddenLayers) {
+			for (Integer i : network.getNumHiddenLayers()) {
 				file.writeInt(i);
 			}
 			
-			for (String i : network.hiddenActivations) {
+			for (String i : network.getHiddenActivations()) {
 				char a = i.toLowerCase().charAt(0);
 				file.writeChar(a);
 			}
@@ -140,17 +140,7 @@ public class FileMenu {
 				}
 				hiddenActivations = new String[hiddenLayerSize];
 				for (int i = 0; i < hiddenLayerSize; i++) {
-					String result = "";
-					switch (fileStream.readChar()) {
-					case 's':
-						result = "sigmoid";
-						break;
-					case 'r':
-						result = "relu";
-						break;
-					default:
-						result = "sigmoid";
-					}
+					String result = ActivationManager.charToString(fileStream.readChar());
 					hiddenActivations[i] = result;
 				}
 				fileStream.close();
@@ -191,27 +181,18 @@ public class FileMenu {
 			
 			hiddenActivations = new String[hiddenLayerSize];
 			for (int i = 0; i < hiddenLayerSize; i++) {
-				String result = "";
-				switch (fileStream.readChar()) {
-				case 's':
-					result = "sigmoid";
-					break;
-				case 'r':
-					result = "relu";
-					break;
-				default:
-					result = "sigmoid";
-				}
+				String result = ActivationManager.charToString(fileStream.readChar());
 				hiddenActivations[i] = result;
 			}
 			
 			network.setEpoch(epoch);
 			network.setDecayRate(decayRate);
-			network.numHiddenLayers = new ArrayList<>();
+			network.resetNumHiddenLayers();
 	        for (int i : numHiddenLayers) {
-	        	network.numHiddenLayers.add(i);
+	        	network.addNumHiddenLayers(i);
 	        }
-			network.hiddenActivations = new ArrayList<>(Arrays.asList(hiddenActivations));
+	        network.resetHiddenActivations();
+			network.addHiddenActivations(hiddenActivations);
 			network.reconstruct();
 			
 			for (int indexLayer = 1; indexLayer <= hiddenLayerSize; indexLayer++) {

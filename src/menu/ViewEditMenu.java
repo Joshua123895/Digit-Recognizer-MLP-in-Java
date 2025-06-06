@@ -20,7 +20,7 @@ public class ViewEditMenu {
 		ConsoleHandler.clear();
 		
 		ArrayList<Integer> numLayer = new ArrayList<>(Arrays.asList(784));
-		for (Integer i : network.numHiddenLayers) {
+		for (Integer i : network.getNumHiddenLayers()) {
 			numLayer.add(i);
 		}
 		numLayer.add(10);
@@ -54,7 +54,7 @@ public class ViewEditMenu {
 			System.out.println();
 		}
 		System.out.print(" ");
-		for (String str : network.hiddenActivations) {
+		for (String str : network.getHiddenActivations()) {
 			System.out.print("   " + str.toLowerCase().substring(0, 3));
 		}
 		System.out.println("   sig");
@@ -87,7 +87,7 @@ public class ViewEditMenu {
 			try {
 				if (input.equalsIgnoreCase("exit")) break;
 				int index = Integer.parseInt(part[1]) - 1;
-				if (index < 0 || index > network.numHiddenLayers.size()) {
+				if (index < 0 || index > network.getNumHiddenLayers().size()) {
 					throw new Exception();
 				}
 				int neuron;
@@ -100,8 +100,8 @@ public class ViewEditMenu {
 					if (neuron <= 0) {
 						throw new Exception();
 					}
-					network.numHiddenLayers.add(index, neuron);
-					network.hiddenActivations.add(index, part[3]);
+					network.addNumHiddenLayers(index, neuron);
+					network.addHiddenActivations(index, part[3]);
 					break;
 				case "change":
 					if (part.length != 4) {
@@ -111,15 +111,15 @@ public class ViewEditMenu {
 					if (neuron <= 0) {
 						throw new Exception();
 					}
-					network.numHiddenLayers.set(index, neuron);
-					network.hiddenActivations.set(index, part[3]);
+					network.setNumHiddenLayers(index, neuron);
+					network.setHiddenActivations(index, part[3]);
 					break;
 				case "delete":
-					if (part.length != 2 || network.numHiddenLayers.size() <= 1) {
+					if (part.length != 2 || network.getNumHiddenLayers().size() <= 1) {
 						throw new Exception();
 					}
-					network.numHiddenLayers.remove(index);
-					network.hiddenActivations.remove(index);
+					network.removeNumHiddenLayers(index);
+					network.removeHiddenActivations(index);
 					break;
 				default:
 					throw new Exception();

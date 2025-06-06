@@ -1,12 +1,9 @@
 package menu;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import mnist.MNISTManager;
 import neuralNetwork.NeuralNetwork;
-import tool.InputHandler;
 import tool.ConsoleHandler;
+import tool.InputHandler;
 
 public class MainMenu {
 	InputHandler scan = new InputHandler();
@@ -46,8 +43,10 @@ public class MainMenu {
 		String validate = scan.stringInput("Are you sure[yes/no]? ");
 		if (validate.equalsIgnoreCase("yes")) {
 			network.setEpoch(0);
-			network.numHiddenLayers = new ArrayList<>(Arrays.asList(128));
-			network.hiddenActivations = new ArrayList<>(Arrays.asList("sigmoid"));
+			network.resetNumHiddenLayers();
+			network.addNumHiddenLayers(128);
+			network.resetHiddenActivations();
+			network.addHiddenActivations("sigmoid");
 			network.reconstruct();
 			System.out.println("neural network is resetted!");
 		} else {

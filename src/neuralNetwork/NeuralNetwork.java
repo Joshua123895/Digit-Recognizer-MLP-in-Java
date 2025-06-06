@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import activationFunction.ActivationFunction;
-import activationFunction.ReLu;
+import activationFunction.ActivationManager;
 import activationFunction.Sigmoid;
 
 public class NeuralNetwork {
     private ArrayList<Layer> layers;
-    public ArrayList<Integer> numHiddenLayers = new ArrayList<>(Arrays.asList(128));
-    public ArrayList<String> hiddenActivations = new ArrayList<>(Arrays.asList("sigmoid"));
+    private ArrayList<Integer> numHiddenLayers = new ArrayList<>(Arrays.asList(128));
+    private ArrayList<String> hiddenActivations = new ArrayList<>(Arrays.asList("sigmoid"));
     private double learningRate = 0.01;
     private double decayRate;
     private int epoch = 0;
@@ -39,22 +39,11 @@ public class NeuralNetwork {
 		int prev = 784;
     	for (int i = 0; i < numHiddenLayers.size(); i++) {
     		int num = numHiddenLayers.get(i);
-    		ActivationFunction func = chooseFunction(hiddenActivations.get(i));
+    		ActivationFunction func = ActivationManager.stringToFunction(hiddenActivations.get(i));
     		layers.add(new HiddenLayer(prev, num, func));
     		prev = num;
     	}
 		layers.add(new OutputLayer(prev, 10, new Sigmoid()));
-    }
-    
-    private ActivationFunction chooseFunction(String text) {
-    	switch(text.toLowerCase().trim()) {
-	    case "sigmoid":
-			return new Sigmoid();
-		case "relu":
-			return new ReLu();
-		default:
-			return new Sigmoid();
-		}
     }
     
     public double[] feedForward(double[] input) {
@@ -127,5 +116,59 @@ public class NeuralNetwork {
 
 	public void setLearningRate(double learningRate) {
 		this.learningRate = learningRate;
+	}
+
+	public ArrayList<Integer> getNumHiddenLayers() {
+		return numHiddenLayers;
+	}
+	
+	public void resetNumHiddenLayers() {
+		numHiddenLayers = new ArrayList<>();
+	}
+	
+	public void addNumHiddenLayers(int element) {
+		numHiddenLayers.add(element);
+	}
+	
+	public void addNumHiddenLayers(int index, int element) {
+		numHiddenLayers.add(index, element);
+	}
+	
+	public void setNumHiddenLayers(int index, int element) {
+		numHiddenLayers.set(index, element);
+	}
+	
+	public void removeNumHiddenLayers(int index) {
+		numHiddenLayers.remove(index);
+	}
+
+	public ArrayList<String> getHiddenActivations() {
+		return hiddenActivations;
+	}
+	
+	public void resetHiddenActivations() {
+		hiddenActivations = new ArrayList<>(Arrays.asList());
+	}
+	
+	public void addHiddenActivations(String element) {
+		hiddenActivations.add(element);
+	}
+	
+	public void addHiddenActivations(int index, String element) {
+		hiddenActivations.add(index, element);
+	}
+	
+	public void addHiddenActivations(String[] elements) {
+		for (String element : elements) {
+			addHiddenActivations(element);
+		}
+	}
+
+	public void setHiddenActivations(int index, String element) {
+		hiddenActivations.set(index, element);
+	}
+	
+	public void removeHiddenActivations(int index) {
+		hiddenActivations.remove(index);
 	}
 }
