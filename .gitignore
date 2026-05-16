@@ -1,4 +1,23 @@
+# Compiled files
+*.class
+
+# Jar files
 *.jar
-bin/*
+
+# Zip files
 *.zip
-.settings/*
+
+# Build folders
+bin/
+out/
+target/
+
+# IDE settings
+.settings/
+.idea/
+.project
+.classpath
+
+# OS files
+.DS_Store
+Thumbs.db
