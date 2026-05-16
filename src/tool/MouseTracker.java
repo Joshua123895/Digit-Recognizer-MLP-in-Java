@@ -10,22 +10,25 @@ interface MouseLibrary extends Library {
     // Declare the C function signatures
     void get_mouse_position(IntByReference x, IntByReference y);
     int is_mouse_clicked();
+    void enableMouseOnly();
 }
 
 public class MouseTracker {	
 	IntByReference x = new IntByReference();
 	IntByReference y = new IntByReference();
-	int []wrapper = new int[2];
+	
+	public void enableMouseOnly() {
+		MouseLibrary.INSTANCE.enableMouseOnly();
+	}
 		
 	public boolean isClicked() {
 		return (MouseLibrary.INSTANCE.is_mouse_clicked() != 0);
 	}
 	
-	public int[] getPosition() {
+	public void getPosition(int[] out) {
 		MouseLibrary.INSTANCE.get_mouse_position(x, y);
-		wrapper[0] = x.getValue();
-		wrapper[1] = y.getValue();
-		return wrapper.clone();
+		out[0] = x.getValue();
+		out[1] = y.getValue();
 	}
 	
 	public void waitToPress(long ms) {
@@ -40,9 +43,8 @@ public class MouseTracker {
 		}
 	}
 	
-	public int[] click(long ms) {
+	public void click(long ms) {
 		waitToRelease(ms);
 		waitToPress(ms);
-		return getPosition();
 	}
 }

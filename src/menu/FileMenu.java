@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import activationFunction.ActivationManager;
+import initializer.InitializerManager;
 import neuralNetwork.HiddenLayer;
 import neuralNetwork.NeuralNetwork;
 import neuralNetwork.Neuron;
@@ -35,13 +36,17 @@ public class FileMenu {
 			
 			file.writeInt(hiddenLayerSize);
 			file.writeInt(network.getEpoch());
-			file.writeDouble(network.getDecayRate());
 			
 			for (Integer i : network.getNumHiddenLayers()) {
 				file.writeInt(i);
 			}
 			
 			for (String i : network.getHiddenActivations()) {
+				char a = i.toLowerCase().charAt(0);
+				file.writeChar(a);
+			}
+			
+			for (String i : network.getHiddenInitializers()) {
 				char a = i.toLowerCase().charAt(0);
 				file.writeChar(a);
 			}
@@ -71,7 +76,7 @@ public class FileMenu {
 			}
 			
 			file.close();
-			System.out.println("Succesfully loaded");
+			System.out.println("Succesfully saved");
 		} catch (Exception e) {
 			System.out.println("Can't save the neural network");
 		}
@@ -90,9 +95,9 @@ public class FileMenu {
 
 		int hiddenLayerSize;
 		int epoch;
-		double decayRate;
 		int[] numHiddenLayers;
 		String[] hiddenActivations = null;
+		String[] hiddenInitializers = null;
 		
 		DataInputStream fileStream = null;
 		
@@ -115,6 +120,7 @@ public class FileMenu {
 			System.out.println("________________________________________________________________________________________________________________________________________________________________________________");
 			filename = scan.stringInput("Load file as ('exit' to exit): ", "\\/:*?\"<>| ", 255);
 			if ("exit".equalsIgnoreCase(filename)) return;
+			if (! filename.endsWith(".dat")) filename = filename.concat(".dat");
 			File file = null;
 			for (File currentFile : files) {
 				if (currentFile.getName().equals(filename)) {
@@ -124,7 +130,7 @@ public class FileMenu {
 			}
 			
 			if (file == null) {
-				System.out.println("Can't find the file specified");
+				System.out.println("Can't find the file named \"" + filename + "\".");
 				scan.enter();
 				continue;
 			}
@@ -133,7 +139,6 @@ public class FileMenu {
 				fileStream = new DataInputStream(new FileInputStream(prefixDirectory + filename));
 				hiddenLayerSize = fileStream.readInt();
 				epoch = fileStream.readInt();
-				decayRate = fileStream.readDouble();
 				numHiddenLayers = new int[hiddenLayerSize];
 				for (int i = 0; i < hiddenLayerSize; i++) {
 					numHiddenLayers[i] = fileStream.readInt();
@@ -143,12 +148,17 @@ public class FileMenu {
 					String result = ActivationManager.charToString(fileStream.readChar());
 					hiddenActivations[i] = result;
 				}
+				hiddenInitializers = new String[hiddenLayerSize];
+				for (int i = 0; i < hiddenLayerSize; i++) {
+					String result = InitializerManager.charToString(fileStream.readChar());
+					hiddenInitializers[i] = result;
+				}
 				fileStream.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 				return;
 			}
-			
+			System.out.println("Succesfully loaded \"" + filename + "\".");
 			System.out.println();
 			System.out.printf("Layers: %d\n", hiddenLayerSize+2);
 			System.out.printf("Epoch: %d\n", epoch);
@@ -161,7 +171,12 @@ public class FileMenu {
 			for (String str : hiddenActivations) {
 				System.out.print(str + ", ");
 			}
-			System.out.println("sigmoid");
+			System.out.println("softmax");
+			System.out.print("Initializers: ");
+			for (String str : hiddenInitializers) {
+				System.out.print(str + ", ");
+			}
+			System.out.println("xavier");
 			System.out.println();
 			// are you sure?
 			String confirm = scan.stringInput("Load this file[yes/no]? ");
@@ -172,7 +187,6 @@ public class FileMenu {
 			fileStream = new DataInputStream(new FileInputStream(prefixDirectory + filename));
 			hiddenLayerSize = fileStream.readInt();
 			epoch = fileStream.readInt();
-			decayRate = fileStream.readDouble();
 			numHiddenLayers = new int[hiddenLayerSize];
 			
 			for (int i = 0; i < hiddenLayerSize; i++) {
@@ -185,14 +199,21 @@ public class FileMenu {
 				hiddenActivations[i] = result;
 			}
 			
+			hiddenInitializers = new String[hiddenLayerSize];
+			for (int i = 0; i < hiddenLayerSize; i++) {
+				String result = InitializerManager.charToString(fileStream.readChar());
+				hiddenInitializers[i] = result;
+			}
+			
 			network.setEpoch(epoch);
-			network.setDecayRate(decayRate);
 			network.resetNumHiddenLayers();
 	        for (int i : numHiddenLayers) {
 	        	network.addNumHiddenLayers(i);
 	        }
 	        network.resetHiddenActivations();
 			network.addHiddenActivations(hiddenActivations);
+	        network.resetHiddenInitializers();
+			network.addHiddenInitializers(hiddenInitializers);
 			network.reconstruct();
 			
 			for (int indexLayer = 1; indexLayer <= hiddenLayerSize; indexLayer++) {

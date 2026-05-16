@@ -13,4 +13,8 @@ public class NumberTool {
 	public static double random() {
 		return random.nextDouble();
 	}
+	
+	public static double randomGaussian() {
+		return random.nextGaussian();
+	}
 }

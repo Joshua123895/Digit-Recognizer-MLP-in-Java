@@ -3,7 +3,9 @@ package tool;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 
-public class ConsoleHandler {	
+public class ConsoleHandler {
+	public static final String RESET = "\033[0m";
+	
     public static void clear() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
@@ -55,11 +57,17 @@ public class ConsoleHandler {
 	
     public static void hideCursor() {
         System.out.print("\033[?25l");
+        System.out.flush();
     }
 
     public static void showCursor() {
         System.out.print("\033[?25h");
+        System.out.flush();
     }
+    
+	public static String getColourCode(int bit) {
+	    return "\033[48;5;" + (bit + 232) + "m";
+	}
     
     public static void sleep(long ms) {
     	try {

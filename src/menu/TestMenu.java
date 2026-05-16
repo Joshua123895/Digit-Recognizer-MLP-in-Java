@@ -1,52 +1,68 @@
 package menu;
 
-import mnist.MNISTManager;
 import neuralNetwork.NeuralNetwork;
 import tool.ConsoleHandler;
 import tool.InputHandler;
+import tool.MNISTManager;
+import tool.MouseTracker;
 
 public class TestMenu {
-	NeuralNetwork network;
-	MNISTManager testData;
-	InputHandler scan;
-//	MouseTracker mouse = new MouseTracker();
-	final int lenShade = 24;
-	
-	public TestMenu(NeuralNetwork network, MNISTManager source, InputHandler scan) {
-		this.network = network;
-		this.testData = source;
-		this.scan = scan;
-	}
-	
-	private void drawImage(double []image) {
-		System.out.println(" +--------------------------------------------------------+");
-		for (int i = 0; i < 28; i++) {
-			System.out.print(" |");
-			for (int j = 0; j < 28; j++) {
-				int bit = (int) (image[i*28 + j] * lenShade);
-				bit -= bit / lenShade; // wont go >= len, not out of bound
-				ConsoleHandler.changeColour(bit);
-				System.out.print("  ");
-			}
-			ConsoleHandler.resetColour();
-			System.out.println("|");
-		}
-		System.out.println(" +--------------------------------------------------------+");
-	}
-	
-	private int checkImage(double []image) {
-		double[] result = network.feedForward(image);
-    	double max = result[0];
-    	int predicted = 0;
-    	for (int a = 1; a < 10; a++) {
-    		if (max < result[a]) {
-    			max = result[a];
-    			predicted = a;
-    		}
-    	}
-    	return predicted;
-	}
-	
+
+    NeuralNetwork network;
+    MNISTManager testData;
+    InputHandler scan;
+    MouseTracker mouse = new MouseTracker();
+
+    final int lenShade = 24;
+    final int SIZE = 28;
+
+    public TestMenu(NeuralNetwork network, MNISTManager source, InputHandler scan) {
+        this.network = network;
+        this.testData = source;
+        this.scan = scan;
+    }
+
+    // =========================================================
+    // FAST IMAGE DRAW
+    // =========================================================
+
+    private void drawImage(double[] image) {
+
+        StringBuilder sb = new StringBuilder(5000);
+
+        sb.append(" +--------------------------------------------------------+\n");
+
+        for (int i = 0; i < SIZE; i++) {
+
+            sb.append(" |");
+
+            int prevBit = -1;
+
+            for (int j = 0; j < SIZE; j++) {
+
+                int bit = (int) (image[i * SIZE + j] * lenShade);
+
+                if (bit >= lenShade)
+                    bit = lenShade - 1;
+
+                if (bit != prevBit) {
+                    sb.append(ConsoleHandler.getColourCode(bit));
+                    prevBit = bit;
+                }
+
+                sb.append("  ");
+            }
+
+            sb.append(ConsoleHandler.RESET);
+            sb.append("|\n");
+        }
+
+        sb.append(" +--------------------------------------------------------+\n");
+
+        System.out.print(sb);
+        System.out.flush();
+    }
+    
 	public void test() {
 		ConsoleHandler.clear();
 		System.out.print("Test accuracy: Loading...");
@@ -88,127 +104,183 @@ public class TestMenu {
             scan.enter();
     	}
 	}
-	
-//	private void findIndex(int []mouseXY, int []xy1, int []xy2, int []gridXY) {
-//		for (int i = 0; i < 2; i++) {
-//			gridXY[i] = (mouseXY[i] - xy1[i]) * 28 / (xy2[i] - xy1[i]);;
-//		}
-//	}
-//	
-//	private boolean paintGrid(double []grid, int []gridXY) {
-//		boolean left = (gridXY[0] > 0);
-//		boolean right = (gridXY[0] < 27);
-//		boolean up = (gridXY[1] > 0);
-//		boolean down = (gridXY[1] < 27);
-//		if (!left || !right || !up || !down) return false;
-//		
-//		int index = gridXY[1] * 28 + gridXY[0];
-//		
-//	    grid[index] = Math.min(grid[index] + 0.4, 1.0);
-//	    
-//	    grid[index - 1] = Math.min(grid[index - 1] + 0.3, 1.0);
-//	    grid[index + 1] = Math.min(grid[index + 1] + 0.3, 1.0);
-//	    grid[index - 28] = Math.min(grid[index - 28] + 0.3, 1.0);
-//	    grid[index + 28] = Math.min(grid[index + 28] + 0.3, 1.0);
-//
-//	    grid[index - 1 - 28] = Math.min(grid[index - 1 - 28] + 0.15, 1.0);
-//	    grid[index + 1 - 28] = Math.min(grid[index + 1 - 28] + 0.15, 1.0);
-//	    grid[index + 1 + 28] = Math.min(grid[index + 1 + 28] + 0.15, 1.0);
-//	    grid[index - 1 + 28] = Math.min(grid[index - 1 + 28] + 0.15, 1.0);
-//	    
-//	    return true;
-//	}
-//	
-//	public void drawTest() {
-//		ConsoleHandler.clear();
-//		ConsoleHandler.hideCursor();
-//	    int []xy1 = new int[2];
-//	    int []xy2 = new int[2];
-//		
-//	    // test drawing
-//        ConsoleHandler.changeColour(23);
-//        System.out.print("  ");
-//        ConsoleHandler.changeColour(15);
-//        System.out.print("  ");
-//        ConsoleHandler.resetColour();
-//        System.out.println();
-//        ConsoleHandler.changeColour(15);
-//        System.out.print("  ");
-//        ConsoleHandler.changeColour(23);
-//        System.out.print("  ");
-//        ConsoleHandler.resetColour();
-//
-//        for (int i = 1; i < 28; i++) {
-//            System.out.println();
-//        }
-//        
-//        for (int i = 0; i < 28; i++) {
-//            System.out.print("  ");
-//        }
-//        ConsoleHandler.changeColour(23);
-//        System.out.print("  ");
-//        ConsoleHandler.changeColour(15);
-//        System.out.print("  ");
-//        ConsoleHandler.resetColour();
-//        System.out.println("");
-//
-//        for (int i = 0; i < 28; i++) {
-//            System.out.print("  ");
-//        }
-//        
-//        ConsoleHandler.changeColour(15);
-//        System.out.print("  ");
-//        ConsoleHandler.changeColour(23);
-//        System.out.print("  ");
-//        ConsoleHandler.resetColour();
-//	    
-//	    System.out.print("click in order: top left corner");
-//	    
-//	    xy1 = mouse.click(50);
-//	    
-//	    System.out.println(", then bottom right corner");
-//
-//	    for (int i = 0; i < 2; i++) {
-//	    	System.out.println(xy1[i] + " " + xy2[i]);
-//	    }
-//	    
-//	    xy2 = mouse.click(50);
-//	    
-//	    for (int i = 0; i < 2; i++) {
-//	    	System.out.println(xy1[i] + " " + xy2[i]);
-//	    }
-//	    
-//        double []grid = new double[784];
-//        
-//        ConsoleHandler.clear();
-//        drawImage(grid);
-//        System.out.println("Now you can draw with just ONE stroke!");
-//        
-//        int []paintedXY = new int[2];
-//        int []gridXY = new int[2];
-//        int []mouseXY = new int[2];
-//        
-//        mouse.click(50);
-//        mouse.waitToRelease(50);
-//        while (!mouse.isClicked()) {
-//    		// is drawing (no delay)
-//    		mouseXY = mouse.getPosition();
-//    		findIndex(mouseXY, xy1, xy2, gridXY);
-//    		if (!Arrays.equals(gridXY, paintedXY)) {
-//    			paintGrid(grid, gridXY);
-//        		ConsoleHandler.moveCursorTo(1, 1);
-//        		drawImage(grid);
-//    			
-//    			paintedXY = gridXY.clone();
-//    		}
-//    	}
-//        
-//	    ConsoleHandler.clear();
-//	    drawImage(grid);
-//        int predicted = checkImage(grid);
-//        
-//        System.out.println("Predicted: " + predicted);
-//        ConsoleHandler.showCursor();
-//        scan.enter();
-//	}
+
+    // =========================================================
+    // FAST CHECK IMAGE
+    // =========================================================
+
+    private int checkImage(double[] image) {
+
+        double[] result = network.feedForward(image);
+
+        double max = result[0];
+        int predicted = 0;
+
+        for (int i = 1; i < 10; i++) {
+
+            if (result[i] > max) {
+                max = result[i];
+                predicted = i;
+            }
+        }
+
+        return predicted;
+    }
+
+    // =========================================================
+    // FAST PAINT
+    // =========================================================
+
+    private void add(double[] grid, int idx, double val) {
+
+    	double v = grid[idx] + val;
+        grid[idx] = v > 1.0f ? 1.0f : v;
+    }
+
+    private boolean paintGrid(double[] grid, int gx, int gy) {
+
+        if (gx <= 0 || gx >= 27 || gy <= 0 || gy >= 27)
+            return false;
+
+        int index = gy * SIZE + gx;
+
+        add(grid, index, 0.4f);
+
+        add(grid, index - 1, 0.3f);
+        add(grid, index + 1, 0.3f);
+        add(grid, index - SIZE, 0.3f);
+        add(grid, index + SIZE, 0.3f);
+
+        add(grid, index - 29, 0.15f);
+        add(grid, index - 27, 0.15f);
+        add(grid, index + 27, 0.15f);
+        add(grid, index + 29, 0.15f);
+
+        return true;
+    }
+
+    // =========================================================
+    // DRAW TEST
+    // =========================================================
+
+    public void drawTest() {
+
+        ConsoleHandler.clear();
+        ConsoleHandler.hideCursor();
+
+        Runtime.getRuntime().addShutdownHook(
+            new Thread(ConsoleHandler::showCursor)
+        );
+
+        mouse.enableMouseOnly();
+
+        int[] xy1 = new int[2];
+        int[] xy2 = new int[2];
+
+        // calibration markers
+        ConsoleHandler.changeColour(23);
+        System.out.print("  ");
+        ConsoleHandler.changeColour(15);
+        System.out.print("  ");
+        ConsoleHandler.resetColour();
+        System.out.println();
+
+        ConsoleHandler.changeColour(15);
+        System.out.print("  ");
+        ConsoleHandler.changeColour(23);
+        System.out.print("  ");
+        ConsoleHandler.resetColour();
+
+        for (int i = 1; i < 28; i++) {
+            System.out.println();
+        }
+
+        for (int i = 0; i < 28; i++) {
+            System.out.print("  ");
+        }
+
+        ConsoleHandler.changeColour(23);
+        System.out.print("  ");
+        ConsoleHandler.changeColour(15);
+        System.out.print("  ");
+        ConsoleHandler.resetColour();
+        System.out.println();
+
+        for (int i = 0; i < 28; i++) {
+            System.out.print("  ");
+        }
+
+        ConsoleHandler.changeColour(15);
+        System.out.print("  ");
+        ConsoleHandler.changeColour(23);
+        System.out.print("  ");
+        ConsoleHandler.resetColour();
+
+        System.out.print("click in order: top left corner");
+
+        mouse.click(50);
+        mouse.getPosition(xy1);
+
+        System.out.println(", then bottom right corner");
+
+        mouse.click(50);
+        mouse.getPosition(xy2);
+
+        // =========================================================
+        // PRECOMPUTED SCALE
+        // =========================================================
+
+        double scaleX = 28.0 / (xy2[0] - xy1[0]);
+        double scaleY = 28.0 / (xy2[1] - xy1[1]);
+
+        double[] grid = new double[784];
+
+        ConsoleHandler.clear();
+
+        drawImage(grid);
+
+        System.out.println("Now you can draw with just ONE stroke!");
+
+        int paintedX = -1;
+        int paintedY = -1;
+
+        int[] mouseXY = new int[2];
+
+        mouse.click(50);
+
+        mouse.enableMouseOnly();
+
+        while (mouse.isClicked()) {
+
+            mouse.getPosition(mouseXY);
+
+            int gx = (int) ((mouseXY[0] - xy1[0]) * scaleX);
+            int gy = (int) ((mouseXY[1] - xy1[1]) * scaleY);
+
+            if (gx == paintedX && gy == paintedY)
+                continue;
+
+            if (!paintGrid(grid, gx, gy))
+                continue;
+
+            paintedX = gx;
+            paintedY = gy;
+
+            ConsoleHandler.moveCursorTo(1, 1);
+
+            drawImage(grid);
+        }
+
+        ConsoleHandler.clear();
+
+        drawImage(grid);
+
+        int predicted = checkImage(grid);
+
+        System.out.println("Predicted: " + predicted);
+
+        ConsoleHandler.showCursor();
+
+        scan.enter();
+    }
 }

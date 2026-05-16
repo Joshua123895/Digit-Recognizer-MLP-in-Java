@@ -5,14 +5,16 @@ import java.util.Arrays;
 
 import activationFunction.ActivationFunction;
 import activationFunction.ActivationManager;
-import activationFunction.Sigmoid;
+import initializer.Initializer;
+import initializer.InitializerManager;
+import menu.TrainMenu;
 
 public class NeuralNetwork {
     private ArrayList<Layer> layers;
     private ArrayList<Integer> numHiddenLayers = new ArrayList<>(Arrays.asList(128));
     private ArrayList<String> hiddenActivations = new ArrayList<>(Arrays.asList("sigmoid"));
+    private ArrayList<String> hiddenInitializers = new ArrayList<>(Arrays.asList("xavier"));
     private double learningRate = 0.01;
-    private double decayRate;
     private int epoch = 0;
 	
 	final double initialLearningRate = 0.01;
@@ -34,16 +36,30 @@ public class NeuralNetwork {
     		}
     		System.exit(1);
     	}
+    	if (hiddenActivations.size() != hiddenInitializers.size()) {
+
+    		System.out.println("hiddenInitializers.length != hiddenActivations.length");
+    		System.out.println("hiddenInitializers: " + hiddenInitializers.size());
+    		for (String i : hiddenInitializers) {
+    			System.out.println(i);
+    		}
+    		System.out.println("hiddenActivations: " + hiddenActivations.size());
+    		for (String i : hiddenActivations) {
+    			System.out.println(i);
+    		}
+    		System.exit(1);
+    	}
         layers = new ArrayList<>();
 		layers.add(new InputLayer(784));
 		int prev = 784;
     	for (int i = 0; i < numHiddenLayers.size(); i++) {
     		int num = numHiddenLayers.get(i);
     		ActivationFunction func = ActivationManager.stringToFunction(hiddenActivations.get(i));
-    		layers.add(new HiddenLayer(prev, num, func));
+    		Initializer init = InitializerManager.stringToInit(hiddenInitializers.get(i), (i == 0)? 784 : numHiddenLayers.get(i-1));
+    		layers.add(new HiddenLayer(prev, num, func, init));
     		prev = num;
     	}
-		layers.add(new OutputLayer(prev, 10, new Sigmoid()));
+		layers.add(new OutputLayer(prev, 10));
     }
     
     public double[] feedForward(double[] input) {
@@ -78,6 +94,16 @@ public class NeuralNetwork {
         }
     }
     
+    public void applyBatchGradients(int batchSize) {
+        for (Layer layer : layers) {
+            if (layer instanceof HiddenLayer) {
+                ((HiddenLayer) layer).applyGradients(learningRate, batchSize);
+            } else if (layer instanceof OutputLayer) {
+                ((OutputLayer) layer).applyGradients(learningRate, batchSize);
+            }
+        }
+    }
+    
     public Layer getLayer(int index) {
     	return layers.get(index);
     }
@@ -97,17 +123,9 @@ public class NeuralNetwork {
 	public int getEpoch() {
 		return epoch;
 	}
-
-	public void setDecayRate(double decayRate) {
-		this.decayRate = decayRate;
-	}
-
-	public double getDecayRate() {
-		return decayRate;
-	}
     
     public void nextLearningate() {
-    	this.learningRate = initialLearningRate * Math.exp(-this.decayRate * this.epoch);
+    	this.learningRate = initialLearningRate * Math.exp(-TrainMenu.getDecayRate() * this.epoch);
     }
 
 	public double getLearningRate() {
@@ -170,5 +188,39 @@ public class NeuralNetwork {
 	
 	public void removeHiddenActivations(int index) {
 		hiddenActivations.remove(index);
+	}
+
+	public ArrayList<String> getHiddenInitializers() {
+		return hiddenInitializers;
+	}
+	
+	public void resetHiddenInitializers() {
+		hiddenInitializers = new ArrayList<>(Arrays.asList());
+	}
+	
+	public void addHiddenInitializers(String element) {
+		hiddenInitializers.add(element);
+	}
+	
+	public void addHiddenInitializers(int index, String element) {
+		hiddenInitializers.add(index, element);
+	}
+	
+	public void addHiddenInitializers(String[] elements) {
+		for (String element : elements) {
+			addHiddenInitializers(element);
+		}
+	}
+
+	public void setHiddenInitializers(int index, String element) {
+		hiddenInitializers.set(index, element);
+	}
+	
+	public void removeHiddenInitializers(int index) {
+		hiddenInitializers.remove(index);
+	}
+	
+	public double computeLoss(double[] label) {
+		return ((OutputLayer) layers.get(layers.size()-1)).computeLoss(label);
 	}
 }

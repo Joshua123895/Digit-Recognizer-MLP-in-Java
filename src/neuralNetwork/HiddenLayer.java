@@ -1,12 +1,13 @@
 package neuralNetwork;
 
 import activationFunction.ActivationFunction;
+import initializer.Initializer;
 
 public class HiddenLayer extends Layer {
     Neuron[] neurons;
     int inputSize;
 
-    public HiddenLayer(int inputSize, int outputSize, ActivationFunction activationFunction) {
+    public HiddenLayer(int inputSize, int outputSize, ActivationFunction activationFunction, Initializer initializer) {
     	this.inputSize = inputSize;
         this.outputSize = outputSize;
         this.neurons = new Neuron[outputSize];
@@ -14,7 +15,7 @@ public class HiddenLayer extends Layer {
         this.output = new double[outputSize];
 
         for (int i = 0; i < outputSize; i++) {
-            neurons[i] = new Neuron(inputSize, activationFunction);
+            neurons[i] = new Neuron(inputSize, activationFunction, initializer);
         }
     }
     
@@ -47,19 +48,17 @@ public class HiddenLayer extends Layer {
     }
     
     public double[] backward(double[] prevOutput, double[] nextError, Neuron[] nextNeuron, double learningRate) {
-        // Compute the error for this layer
-        computeError(nextError, nextNeuron);
-
-        // Update weights and biases
-        for (int i = 0; i < outputSize; i++) {
-            for (int j = 0; j < prevOutput.length; j++) {
-                double deltaWeight = learningRate * error[i] * prevOutput[j];
-                neurons[i].getWeights()[j] -= deltaWeight;  // Update weight
-            }
-            neurons[i].updateBias(error[i], learningRate); // Update bias
+		computeError(nextError, nextNeuron);
+		for (int i = 0; i < outputSize; i++) {
+			neurons[i].accumulateGradients(prevOutput, error[i]);
+		}
+		return error;
+	}
+    
+    public void applyGradients(double learningRate, int batchSize) {
+        for (Neuron neuron : neurons) {
+            neuron.applyGradients(learningRate, batchSize);
         }
-
-        return error; // Return error to propagate back
     }
 
 }

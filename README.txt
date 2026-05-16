@@ -1,3 +1,7 @@
+to update .jar file in Eclipse:
+1. Right click the project
+2. Export to Runnable jar files
+
 how to run the code:
 1. Click RUN.bat
 
