@@ -11,7 +11,7 @@ public class HeInitializer implements Initializer {
 	
 	@Override
 	public double initializeWeight() {
-		double std = Math.sqrt(2 / inputSize);
+		double std = Math.sqrt(2.0 / inputSize);
 		return NumberTool.randomGaussian() * std;
 	}
 	@Override

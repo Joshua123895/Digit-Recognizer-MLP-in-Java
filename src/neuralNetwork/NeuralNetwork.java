@@ -14,10 +14,10 @@ public class NeuralNetwork {
     private ArrayList<Integer> numHiddenLayers = new ArrayList<>(Arrays.asList(128));
     private ArrayList<String> hiddenActivations = new ArrayList<>(Arrays.asList("sigmoid"));
     private ArrayList<String> hiddenInitializers = new ArrayList<>(Arrays.asList("xavier"));
-    private double learningRate = 0.01;
-    private int epoch = 0;
-	
-	final double initialLearningRate = 0.01;
+    private double initialLearningRate = 0.01;
+    private double learningRate = initialLearningRate;
+    private int epoch = 0;	
+    private int timestep = 0;
     
     public NeuralNetwork() {
     	reconstruct();
@@ -73,6 +73,7 @@ public class NeuralNetwork {
     }
     
     public void backpropagate(double[] result) {
+        this.timestep++;
     	// assume MLS has minimum 1 hidden layer
     	int layerSize = layers.size();
     	
@@ -92,6 +93,7 @@ public class NeuralNetwork {
             
             nextError = hiddenLayer.backward(layers.get(i - 1).output, nextError, nextLayer.neurons, learningRate);
         }
+        
     }
     
     public void applyBatchGradients(int batchSize) {
@@ -131,9 +133,13 @@ public class NeuralNetwork {
 	public double getLearningRate() {
 		return learningRate;
 	}
+	
+	public void setInitialLearningRate(double lr) {
+		this.initialLearningRate = lr;
+	}
 
-	public void setLearningRate(double learningRate) {
-		this.learningRate = learningRate;
+	public double getInitialLearningRate() {
+		return initialLearningRate;
 	}
 
 	public ArrayList<Integer> getNumHiddenLayers() {

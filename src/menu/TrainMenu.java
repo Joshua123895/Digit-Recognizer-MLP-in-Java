@@ -20,15 +20,7 @@ public class TrainMenu {
 		this.trainData = source;
 		this.scan = scan;
 	}
-	
-//	public static void setBatchSize(int batchSize) {
-//		TrainMenu.batchSize = batchSize;
-//	}
-//	
-//	public static void setDecayRate(double decayRate) {
-//		TrainMenu.decayRate = decayRate;
-//	}
-		
+			
 	public static double getDecayRate() {
 		return TrainMenu.decayRate;
 	}
@@ -95,10 +87,12 @@ public class TrainMenu {
 			System.out.println(" Training setting:");
 			System.out.println(" - Batch Size: " + TrainMenu.batchSize);
 			System.out.println(" - Decay Rate: " + TrainMenu.decayRate);
+			System.out.println(" - Learning Rate: " + network.getInitialLearningRate());
 			System.out.println("");
 			System.out.println(" To change: change [name] [value]");
 			System.out.println(" - Batch Size: 2^n, like 1, 2, 4, ..., 256");
 			System.out.println(" - Decay Rate: 0-1");
+			System.out.println(" - Learning Rate (before training only): 0-1");
 			System.out.println("");
 			System.out.println(" To exit: exit");
 			System.out.println("");
@@ -118,7 +112,7 @@ public class TrainMenu {
 						throw new Exception();
 					}
 					TrainMenu.batchSize = n;
-					System.out.println(" Batch Size has been succesfully updated.");
+					System.out.print(" Batch Size");
 					scan.enter();
 					break;
 				case "decay":
@@ -127,13 +121,28 @@ public class TrainMenu {
 						throw new Exception();
 					}
 					TrainMenu.decayRate = d;
-					System.out.println(" Decay Rate has been succesfully updated.");
+					System.out.print(" Decay Rate");
+					scan.enter();
+					break;
+				case "learn":
+					double l = Double.parseDouble(part[part.length - 1]);
+					if (! (l > 0 && l < 1)) {
+						throw new Exception();
+					}
+					if (network.getEpoch() > 0) {
+						System.out.println(" You have trained your model. You cannot update this anymore.");
+						scan.enter();
+						continue;
+					}
+					network.setInitialLearningRate(l);
+					System.out.print(" Learning Rate");
 					scan.enter();
 					break;
 				default:
-					System.out.println(" No settings available");
-					scan.enter();
+					System.out.print(" Nothing");
 				}
+				System.out.println(" has been updated.");
+				scan.enter();
 			} catch (Exception e) {
 				System.out.println(" Input must follow the rules above");
 				scan.enter();

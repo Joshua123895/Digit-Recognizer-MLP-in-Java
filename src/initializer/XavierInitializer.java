@@ -11,7 +11,7 @@ public class XavierInitializer implements Initializer {
 	
 	@Override
 	public double initializeWeight() {
-		double std = Math.sqrt(1 / inputSize);
+		double std = Math.sqrt(1.0 / inputSize);
 		return NumberTool.randomGaussian() * std;
 	}
 	@Override

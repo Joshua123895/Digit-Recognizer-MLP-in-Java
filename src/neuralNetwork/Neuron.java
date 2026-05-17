@@ -11,6 +11,11 @@ public class Neuron {
     private double bias;
     private double[] weightGradients;
     private double biasGradient;
+    
+    private double[] mWeights;
+    private double[] vWeights;
+    private double mBias;
+    private double vBias;
 
     public Neuron(int inputSize, ActivationFunction activationFunction, Initializer initializer) {
         this.activationFunction = activationFunction;
@@ -20,6 +25,8 @@ public class Neuron {
         for (int i = 0; i < inputSize; i++) {
             weights[i] = initializer.initializeWeight();
         }
+        mWeights = new double[inputSize];
+        vWeights = new double[inputSize];
     }
 
     public double activate(double[] input) {
