@@ -2,6 +2,7 @@ package tool;
 
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.util.Collections;
 
 public class ConsoleHandler {
 	public static final String RESET = "\033[0m";
@@ -75,5 +76,15 @@ public class ConsoleHandler {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    public static void printDivider() {
+        // Try to get terminal width, fall back to 80
+    	int width = 80;
+        try {
+            String cols = System.getenv("COLUMNS");
+            width = (cols != null) ? Integer.parseInt(cols) : 80;
+        } catch (NumberFormatException e) {}
+        System.out.println(String.join("", Collections.nCopies(width, "_")));
     }
 }

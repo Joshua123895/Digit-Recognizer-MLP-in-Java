@@ -8,7 +8,7 @@ public class OutputLayer extends Layer {
     Neuron[] neurons;
     int inputSize;
 
-    public OutputLayer(int inputSize, int outputSize) {
+    public OutputLayer(int inputSize, int outputSize, String optimizerName) {
     	this.inputSize = inputSize;
         this.outputSize = outputSize;
         this.neurons = new Neuron[outputSize];
@@ -17,7 +17,7 @@ public class OutputLayer extends Layer {
         Initializer init = new XavierInitializer(inputSize);
 
         for (int i = 0; i < outputSize; i++) {
-            neurons[i] = new Neuron(inputSize, null, init);
+            neurons[i] = new Neuron(inputSize, null, init, optimizerName);
         }
     }
     
@@ -30,7 +30,7 @@ public class OutputLayer extends Layer {
     }
     
     @Override
-    public double[] forward(double[] input) {
+    public double[] forward(double[] input, double dropoutRate) {
     	double[] logits = new double[outputSize];
     	for (int i = 0; i < outputSize; i++) {
     	    logits[i] = neurons[i].computeZ(input);
@@ -64,10 +64,15 @@ public class OutputLayer extends Layer {
         return error;
     }
     
-    public void applyGradients(double learningRate, int batchSize) {
+    public void applyGradients(double learningRate, int timestep, int batchSize) {
         for (Neuron neuron : neurons) {
-            neuron.applyGradients(learningRate, batchSize);
+            neuron.applyGradients(learningRate, timestep, batchSize);
         }
     }
-
+    
+    public void resetGradients() {
+    	for (Neuron n : neurons) {
+    		n.resetGradients();
+    	}
+    }
 }

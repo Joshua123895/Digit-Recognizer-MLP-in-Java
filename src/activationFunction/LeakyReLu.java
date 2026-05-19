@@ -4,7 +4,7 @@ public class LeakyReLu implements ActivationFunction {
 	double leak = 0.01;
 	@Override
 	public double activate(double input) {
-		return Math.max(input, leak*input);
+		return (input > 0) ? input : leak * input;
 	}
 
 	@Override

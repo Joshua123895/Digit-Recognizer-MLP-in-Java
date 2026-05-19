@@ -48,9 +48,10 @@ public class MainMenu {
 			network.resetNumHiddenLayers();
 			network.addNumHiddenLayers(128);
 			network.resetHiddenActivations();
-			network.addHiddenActivations("sigmoid");
+			network.addHiddenActivations("relu");
 			network.resetHiddenInitializers();
-			network.addHiddenInitializers("xavier");
+			network.addHiddenInitializers("he");
+			network.setOptimizerName("adam");
 			network.reconstruct();
 			System.out.println("neural network is resetted!");
 			scan.enter();

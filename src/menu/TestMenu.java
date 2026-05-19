@@ -27,38 +27,25 @@ public class TestMenu {
     // =========================================================
 
     private void drawImage(double[] image) {
-
         StringBuilder sb = new StringBuilder(5000);
-
         sb.append(" +--------------------------------------------------------+\n");
-
         for (int i = 0; i < SIZE; i++) {
-
             sb.append(" |");
-
             int prevBit = -1;
-
             for (int j = 0; j < SIZE; j++) {
-
                 int bit = (int) (image[i * SIZE + j] * lenShade);
-
                 if (bit >= lenShade)
                     bit = lenShade - 1;
-
                 if (bit != prevBit) {
                     sb.append(ConsoleHandler.getColourCode(bit));
                     prevBit = bit;
                 }
-
                 sb.append("  ");
             }
-
             sb.append(ConsoleHandler.RESET);
             sb.append("|\n");
         }
-
         sb.append(" +--------------------------------------------------------+\n");
-
         System.out.print(sb);
         System.out.flush();
     }
@@ -105,40 +92,25 @@ public class TestMenu {
     	}
 	}
 
-    // =========================================================
-    // FAST CHECK IMAGE
-    // =========================================================
-
     private int checkImage(double[] image) {
-
-        double[] result = network.feedForward(image);
-
+        double[] result = network.feedForward(image, false);
         double max = result[0];
         int predicted = 0;
-
         for (int i = 1; i < 10; i++) {
-
             if (result[i] > max) {
                 max = result[i];
                 predicted = i;
             }
         }
-
         return predicted;
     }
-
-    // =========================================================
-    // FAST PAINT
-    // =========================================================
-
+    
     private void add(double[] grid, int idx, double val) {
-
     	double v = grid[idx] + val;
         grid[idx] = v > 1.0f ? 1.0f : v;
     }
 
     private boolean paintGrid(double[] grid, int gx, int gy) {
-
         if (gx <= 0 || gx >= 27 || gy <= 0 || gy >= 27)
             return false;
 
@@ -159,10 +131,6 @@ public class TestMenu {
         return true;
     }
 
-    // =========================================================
-    // DRAW TEST
-    // =========================================================
-
     public void drawTest() {
 
         ConsoleHandler.clear();
@@ -177,7 +145,6 @@ public class TestMenu {
         int[] xy1 = new int[2];
         int[] xy2 = new int[2];
 
-        // calibration markers
         ConsoleHandler.changeColour(23);
         System.out.print("  ");
         ConsoleHandler.changeColour(15);
@@ -226,10 +193,6 @@ public class TestMenu {
         mouse.click(50);
         mouse.getPosition(xy2);
 
-        // =========================================================
-        // PRECOMPUTED SCALE
-        // =========================================================
-
         double scaleX = 28.0 / (xy2[0] - xy1[0]);
         double scaleY = 28.0 / (xy2[1] - xy1[1]);
 
@@ -272,15 +235,10 @@ public class TestMenu {
         }
 
         ConsoleHandler.clear();
-
         drawImage(grid);
-
         int predicted = checkImage(grid);
-
         System.out.println("Predicted: " + predicted);
-
         ConsoleHandler.showCursor();
-
         scan.enter();
     }
 }

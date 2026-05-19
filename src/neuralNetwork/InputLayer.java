@@ -7,7 +7,7 @@ public class InputLayer extends Layer {
     }
 
     @Override
-    public double[] forward(double[] input) {
+    public double[] forward(double[] input, double dropoutRate) {
     	output = input.clone();
         return output;
     }

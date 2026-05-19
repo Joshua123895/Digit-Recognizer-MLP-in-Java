@@ -2,31 +2,27 @@ package neuralNetwork;
 
 import activationFunction.ActivationFunction;
 import initializer.Initializer;
+import optimizer.Optimizer;
+import optimizer.OptimizerManager;
 
 public class Neuron {
-
     private ActivationFunction activationFunction;
+    private Optimizer optimizer;
 
     private double[] weights;
     private double bias;
     private double[] weightGradients;
-    private double biasGradient;
-    
-    private double[] mWeights;
-    private double[] vWeights;
-    private double mBias;
-    private double vBias;
+    private double biasGradient;    
 
-    public Neuron(int inputSize, ActivationFunction activationFunction, Initializer initializer) {
+    public Neuron(int inputSize, ActivationFunction activationFunction, Initializer initializer, String optimizerName) {
         this.activationFunction = activationFunction;
+        this.optimizer = OptimizerManager.stringToFunction(optimizerName, inputSize);
         this.weights = new double[inputSize];
         this.weightGradients = new double[inputSize];
         this.bias = initializer.initializeBias();
         for (int i = 0; i < inputSize; i++) {
             weights[i] = initializer.initializeWeight();
         }
-        mWeights = new double[inputSize];
-        vWeights = new double[inputSize];
     }
 
     public double activate(double[] input) {
@@ -57,16 +53,25 @@ public class Neuron {
         biasGradient += error;
     }
     
-    public void applyGradients(double learningRate, int batchSize) {
-        for (int i = 0; i < weights.length; i++) {
-            weights[i] -= learningRate *
-                    (weightGradients[i] / batchSize);
-
-            weightGradients[i] = 0;
+    private void normalizeGradients(int batchSize) {
+        for (int i = 0; i < weightGradients.length; i++) {
+            weightGradients[i] /= batchSize;
         }
-        bias -= learningRate *
-                (biasGradient / batchSize);
-        biasGradient = 0;
+        biasGradient /= batchSize;
+    }
+    
+    public void applyGradients(double learningRate, int timestep, int batchSize) {
+    	normalizeGradients(batchSize);
+        optimizer.update(weights, weightGradients, learningRate, timestep);
+        bias = optimizer.updateBias(bias, biasGradient, learningRate, timestep);
+//        resetGradients(); // already done in the layers
+    }
+    
+    public void resetGradients() {
+        for (int i = 0; i < weightGradients.length; i++) {
+            weightGradients[i] = 0.0;
+        }
+        biasGradient = 0.0;
     }
 
     public double[] getWeights() {

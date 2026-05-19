@@ -7,17 +7,20 @@ import activationFunction.ActivationFunction;
 import activationFunction.ActivationManager;
 import initializer.Initializer;
 import initializer.InitializerManager;
-import menu.TrainMenu;
 
 public class NeuralNetwork {
     private ArrayList<Layer> layers;
     private ArrayList<Integer> numHiddenLayers = new ArrayList<>(Arrays.asList(128));
-    private ArrayList<String> hiddenActivations = new ArrayList<>(Arrays.asList("sigmoid"));
-    private ArrayList<String> hiddenInitializers = new ArrayList<>(Arrays.asList("xavier"));
-    private double initialLearningRate = 0.01;
+    private ArrayList<String> hiddenActivations = new ArrayList<>(Arrays.asList("relu"));
+    private ArrayList<String> hiddenInitializers = new ArrayList<>(Arrays.asList("he"));
+    private String optimizerName = "adam";
+    private double initialLearningRate = 0.001;
     private double learningRate = initialLearningRate;
+    private double decayRate = 0.01;
+    private int batchSize = 64;
     private int epoch = 0;	
     private int timestep = 0;
+    private double dropoutRate = 0.2;
     
     public NeuralNetwork() {
     	reconstruct();
@@ -37,7 +40,6 @@ public class NeuralNetwork {
     		System.exit(1);
     	}
     	if (hiddenActivations.size() != hiddenInitializers.size()) {
-
     		System.out.println("hiddenInitializers.length != hiddenActivations.length");
     		System.out.println("hiddenInitializers: " + hiddenInitializers.size());
     		for (String i : hiddenInitializers) {
@@ -56,24 +58,23 @@ public class NeuralNetwork {
     		int num = numHiddenLayers.get(i);
     		ActivationFunction func = ActivationManager.stringToFunction(hiddenActivations.get(i));
     		Initializer init = InitializerManager.stringToInit(hiddenInitializers.get(i), (i == 0)? 784 : numHiddenLayers.get(i-1));
-    		layers.add(new HiddenLayer(prev, num, func, init));
+    		layers.add(new HiddenLayer(prev, num, func, init, optimizerName));
     		prev = num;
     	}
-		layers.add(new OutputLayer(prev, 10));
+		layers.add(new OutputLayer(prev, 10, optimizerName));
     }
     
-    public double[] feedForward(double[] input) {
+    public double[] feedForward(double[] input, boolean isTraining) {
         double[] currentInput = input;
 
         for (Layer layer : layers) {
-            currentInput = layer.forward(currentInput);
+            currentInput = layer.forward(currentInput, dropoutRate);
         }
         
         return currentInput;
     }
     
     public void backpropagate(double[] result) {
-        this.timestep++;
     	// assume MLS has minimum 1 hidden layer
     	int layerSize = layers.size();
     	
@@ -96,15 +97,22 @@ public class NeuralNetwork {
         
     }
     
-    public void applyBatchGradients(int batchSize) {
-        for (Layer layer : layers) {
-            if (layer instanceof HiddenLayer) {
-                ((HiddenLayer) layer).applyGradients(learningRate, batchSize);
-            } else if (layer instanceof OutputLayer) {
-                ((OutputLayer) layer).applyGradients(learningRate, batchSize);
-            }
-        }
+    public void applyGradients() {
+        this.timestep++;
+    	applyGradients(batchSize);
     }
+    
+    public void applyGradients(int batchSize) {
+	    for (Layer layer : layers) {
+	        if (layer instanceof HiddenLayer) {
+	            ((HiddenLayer) layer).applyGradients(learningRate, timestep, batchSize);
+	            ((HiddenLayer) layer).resetGradients();
+	        } else if (layer instanceof OutputLayer) {
+	            ((OutputLayer) layer).applyGradients(learningRate, timestep, batchSize);
+	            ((OutputLayer) layer).resetGradients();
+	        }
+	    }
+	}
     
     public Layer getLayer(int index) {
     	return layers.get(index);
@@ -120,6 +128,7 @@ public class NeuralNetwork {
 
 	public void nextEpoch() {
 		this.epoch++;
+//		this.timestep = 0;
 	}
 
 	public int getEpoch() {
@@ -127,7 +136,7 @@ public class NeuralNetwork {
 	}
     
     public void nextLearningate() {
-    	this.learningRate = initialLearningRate * Math.exp(-TrainMenu.getDecayRate() * this.epoch);
+    	this.learningRate = initialLearningRate * Math.exp(-decayRate * this.epoch);
     }
 
 	public double getLearningRate() {
@@ -226,6 +235,46 @@ public class NeuralNetwork {
 		hiddenInitializers.remove(index);
 	}
 	
+	public void setOptimizerName(String name) {
+		optimizerName = name;
+	}
+	
+	public String getOptimizerName() {
+		return optimizerName;
+	}
+	
+	public double getDecayRate() {
+		return decayRate;
+	}
+
+	public void setDecayRate(double decayRate) {
+		this.decayRate = decayRate;
+	}
+	
+	public int getBatchSize() {
+		return batchSize;
+	}
+
+	public void setBatchSize(int batchSize) {
+		this.batchSize = batchSize;
+	}
+	
+	public int getTimestep() {
+		return timestep;
+	}
+
+	public void setTimestep(int timestep) {
+		this.timestep = timestep;
+	}
+
+	public double getDropoutRate() {
+		return dropoutRate;
+	}
+
+	public void setDropoutRate(double dropoutRate) {
+		this.dropoutRate = dropoutRate;
+	}
+
 	public double computeLoss(double[] label) {
 		return ((OutputLayer) layers.get(layers.size()-1)).computeLoss(label);
 	}

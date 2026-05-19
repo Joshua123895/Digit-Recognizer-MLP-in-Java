@@ -5,5 +5,5 @@ public abstract class Layer {
     protected double[] error;
     protected double[] output;
 
-    public abstract double[] forward(double[] input);
+    public abstract double[] forward(double[] input, double dropoutRate);
 }
