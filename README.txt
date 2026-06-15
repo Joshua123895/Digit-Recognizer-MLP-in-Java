@@ -1,6 +1,6 @@
-# Handwritten Digit Recognizer (MLP in Java)
+# Handwritten Digit Recognizer
 
-A handwritten digit recognition system built from scratch using a Multi-Layer Perceptron (MLP) implemented entirely in Java. The model is trained on the MNIST dataset and includes training, testing, visualization, and an interactive drawing interface.
+A handwritten digit recognition system built from scratch in Java using a Multi-Layer Perceptron (MLP) implemented entirely in Java. The model is trained on the MNIST dataset and includes training, testing, visualization, and an interactive drawing interface.
 
 ---
 
